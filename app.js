@@ -8,6 +8,9 @@ const app = express();
 // config JSON response
 app.use(express.json());
 
+// Models
+const User = require('./models/User');
+
 // open route - public route
 app.get('/', (req, res) => {
     res.status(200).json({ msg: "Welcome to this API." });
@@ -16,9 +19,20 @@ app.get('/', (req, res) => {
 // register user
 app.post('/auth/register', async(req, res) => {
     const { name, email, password, confirmpassword } = req.body;
+
     // validations
     if(!name) {
-        return res.status(422).json({ msg: 'Name is required' });
+        return res.status(422).json({ msg: 'name is required' });
+    }
+    if(!email) {
+        return res.status(422).json({ msg: 'email is required' });
+    }
+    if(!password) {
+        return res.status(422).json({ msg: 'password is required' });
+    }
+
+    if(password !== confirmpassword) {
+        return res.status(422).json({ msg: 'Passwords do not match' });
     }
 });
 
