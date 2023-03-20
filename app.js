@@ -34,6 +34,30 @@ app.post('/auth/register', async(req, res) => {
     if(password !== confirmpassword) {
         return res.status(422).json({ msg: 'Passwords do not match' });
     }
+
+    // check if users exists
+    const userExists = await User.findOne({ email: email });
+    if(userExists) {
+        return res.status(422).json({ msg: 'Use another email.' });
+    }
+
+    // create password
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // create user
+    const user = new User({
+        name, email, password
+    });
+
+    try {
+        await user.save();
+        res.status(201).json({ msg: "User created."});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "Something went wrong. Try again later."})
+    }
 });
 
 // credencials
